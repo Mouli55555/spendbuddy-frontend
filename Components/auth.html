@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendBuddy - Your Smart Expense Tracker</title>
+    <link rel="stylesheet" href="../CSS/auth.css">
+
+</head>
+<body>
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Track Every Penny with <span class="gradient-text">SpendBuddy</span></h1>
+                    <p>Take control of your finances with intelligent expense tracking, smart categorization, and insightful analytics.</p>
+                    
+                    <div class="features-preview">
+                        <div class="feature-item">
+                            <div class="feature-icon">💰</div>
+                            <span>Smart Categories</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">📊</div>
+                            <span>Visual Reports</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">📱</div>
+                            <span>Easy Tracking</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-card">
+                    <div class="auth-tabs">
+                        <div class="auth-tab active" onclick="switchTab('signin')">Sign In</div>
+                        <div class="auth-tab" onclick="switchTab('signup')">Sign Up</div>
+                    </div>
+
+                    <div id="alert" class="alert"></div>
+
+                    <!-- Sign In Form -->
+                    <form class="auth-form active" id="signinForm">
+                        <div class="form-group">
+                            <label for="signinUsername">Username</label>
+                            <input type="text" id="signinUsername" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signinPassword">Password</label>
+                            <input type="password" id="signinPassword" name="password" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Sign In to SpendBuddy</button>
+                    </form>
+
+                    <!-- Sign Up Form -->
+                    <form class="auth-form" id="signupForm">
+                        <div class="form-group">
+                            <label for="signupUsername">Username</label>
+                            <input type="text" id="signupUsername" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email</label>
+                            <input type="email" id="signupEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" name="password" required minlength="6">
+                        </div>
+                        <button type="submit" class="submit-btn">Create Your Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Cards -->
+        <div class="floating-card floating-card-1">
+            <div style="color: white; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;">₹15,420</div>
+                <div style="opacity: 0.8;">This Month's Expenses</div>
+            </div>
+        </div>
+
+        <div class="floating-card floating-card-2">
+            <div style="color: white; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;">8 Categories</div>
+                <div style="opacity: 0.8;">Organized Spending</div>
+            </div>
+        </div>
+
+        <div class="floating-card floating-card-3">
+            <div style="color: white; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;">24% Saved</div>
+                <div style="opacity: 0.8;">vs Last Month</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Before closing </body> tag -->
+    <script src="../Config/config.js"></script>
+    <script src="../JS/api.js"></script>
+    <script src="../JS/auth.js"></script>
+</body>
+</html>

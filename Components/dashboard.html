@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - SpendBuddy</title>
+  <link rel="stylesheet" href="../CSS/auth.css">
+  <link rel="stylesheet" href="../CSS/dashboard.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <span>💰</span>
+        <span>SpendBuddy</span>
+      </div>
+      <div class="nav-actions">
+        <div class="user-info">
+          <span>👤</span>
+          <span id="username">Loading...</span>
+        </div>
+        <button class="btn btn-primary" onclick="openAddExpenseModal()">
+          <span>➕</span>
+          Add Expense
+        </button>
+        <button class="btn btn-secondary" onclick="api.logout()">
+          <span>🚪</span>
+          Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard -->
+  <div class="dashboard">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h1>Welcome back! 👋</h1>
+      <p>Here's your financial overview for this month</p>
+    </div>
+
+    <!-- Add this section after welcome-section and before stats-grid -->
+<div class="quick-actions-section">
+  <div class="quick-actions-container">
+    <button class="quick-action-btn primary" onclick="openAddExpenseModal()">
+      <div class="action-icon">💰</div>
+      <div class="action-text">
+        <span class="action-title">Add Expense</span>
+        <span class="action-subtitle">Track new spending</span>
+      </div>
+    </button>
+    
+    <button class="quick-action-btn secondary" onclick="openAddCategoryModal()">
+      <div class="action-icon">🏷️</div>
+      <div class="action-text">
+        <span class="action-title">Add Category</span>
+        <span class="action-subtitle">Create new category</span>
+      </div>
+    </button>
+    
+    <button class="quick-action-btn tertiary" onclick="openAddPaymentModal()">
+      <div class="action-icon">💳</div>
+      <div class="action-text">
+        <span class="action-title">Add Payment Type</span>
+        <span class="action-subtitle">New payment method</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value" id="totalExpenses">₹0</div>
+        <div class="stat-label">Total Expenses</div>
+        <div class="stat-change" id="expenseChange">This Month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-value" id="totalTransactions">0</div>
+        <div class="stat-label">Total Transactions</div>
+        <div class="stat-change positive" id="transactionChange">+0 from last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏷️</div>
+        <div class="stat-value" id="totalCategories">0</div>
+        <div class="stat-label">Active Categories</div>
+        <div class="stat-change" id="categoryChange">Categories Used</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-value" id="avgExpense">₹0</div>
+        <div class="stat-label">Avg. Daily Spending</div>
+        <div class="stat-change" id="avgChange">This Month</div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Expense Trends</div>
+            <div class="chart-subtitle">Daily spending over the last 30 days</div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Categories</div>
+            <div class="chart-subtitle">Spending by category</div>
+          </div>
+        </div>
+        <div class="doughnut-container">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Expenses -->
+    <div class="recent-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Expenses</h2>
+        <button class="btn btn-secondary" onclick="viewAllExpenses()">View All</button>
+      </div>
+      <div class="expenses-card">
+        <div id="recentExpenses">
+          <div class="loading">Loading recent expenses...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div class="modal-overlay" id="addExpenseModal">
+    <div class="modal">
+      <h2>Add New Expense</h2>
+      <form id="addExpenseForm">
+        <div class="form-group">
+          <label for="expenseAmount">Amount</label>
+          <input type="number" id="expenseAmount" name="amount" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label for="expenseDescription">Description</label>
+          <input type="text" id="expenseDescription" name="expenseDescription" required>
+        </div>
+        <div class="form-group">
+          <label for="expenseCategory">Category</label> 
+          <select id="expenseCategory" name="categoryId" required>
+            <option value="">Select Category</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="expensePayment">Payment Method</label>
+          <select id="expensePayment" name="paymentId" required>
+            <option value="">Select Payment Method</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="expenseDate">Date</label>
+          <input type="date" id="expenseDate" name="expenseDate" required>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAddExpenseModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+<div class="modal-overlay" id="addCategoryModal">
+  <div class="modal">
+    <h2>Add New Category</h2>
+    <form id="addCategoryForm">
+      <div class="form-group">
+        <label for="categoryName">Category Name</label>
+        <input type="text" id="categoryName" name="name" required>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeAddCategoryModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Payment Type Modal -->
+<div class="modal-overlay" id="addPaymentModal">
+  <div class="modal">
+    <h2>Add New Payment Type</h2>
+    <form id="addPaymentForm">
+      <div class="form-group">
+        <label for="paymentType">Payment Type</label>
+        <input type="text" id="paymentType" name="type" required>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeAddPaymentModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Payment Type</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Scripts -->
+    <script src="../Config/config.js"></script>
+    <script src="../JS/api.js"></script>
+    <script src="../JS/dashboard.js"></script>
+
+</body>
+</html>
