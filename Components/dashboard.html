@@ -9,6 +9,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
+  <!-- CSS-only toggle checkbox -->
+  <input type="checkbox" id="mobile-nav-toggle">
+  
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
@@ -16,6 +19,10 @@
         <span>💰</span>
         <span>SpendBuddy</span>
       </div>
+      
+      <!-- Mobile toggle button -->
+      <label for="mobile-nav-toggle" class="nav-toggle"></label>
+      
       <div class="nav-actions">
         <div class="user-info">
           <span>👤</span>
@@ -41,34 +48,34 @@
       <p>Here's your financial overview for this month</p>
     </div>
 
-    <!-- Add this section after welcome-section and before stats-grid -->
-<div class="quick-actions-section">
-  <div class="quick-actions-container">
-    <button class="quick-action-btn primary" onclick="openAddExpenseModal()">
-      <div class="action-icon">💰</div>
-      <div class="action-text">
-        <span class="action-title">Add Expense</span>
-        <span class="action-subtitle">Track new spending</span>
+    <!-- Quick Actions Section -->
+    <div class="quick-actions-section">
+      <div class="quick-actions-container">
+        <button class="quick-action-btn primary" onclick="openAddExpenseModal()">
+          <div class="action-icon">💰</div>
+          <div class="action-text">
+            <span class="action-title">Add Expense</span>
+            <span class="action-subtitle">Track new spending</span>
+          </div>
+        </button>
+        
+        <button class="quick-action-btn secondary" onclick="openAddCategoryModal()">
+          <div class="action-icon">🏷️</div>
+          <div class="action-text">
+            <span class="action-title">Add Category</span>
+            <span class="action-subtitle">Create new category</span>
+          </div>
+        </button>
+        
+        <button class="quick-action-btn tertiary" onclick="openAddPaymentModal()">
+          <div class="action-icon">💳</div>
+          <div class="action-text">
+            <span class="action-title">Add Payment Type</span>
+            <span class="action-subtitle">New payment method</span>
+          </div>
+        </button>
       </div>
-    </button>
-    
-    <button class="quick-action-btn secondary" onclick="openAddCategoryModal()">
-      <div class="action-icon">🏷️</div>
-      <div class="action-text">
-        <span class="action-title">Add Category</span>
-        <span class="action-subtitle">Create new category</span>
-      </div>
-    </button>
-    
-    <button class="quick-action-btn tertiary" onclick="openAddPaymentModal()">
-      <div class="action-icon">💳</div>
-      <div class="action-text">
-        <span class="action-title">Add Payment Type</span>
-        <span class="action-subtitle">New payment method</span>
-      </div>
-    </button>
-  </div>
-</div>
+    </div>
 
     <!-- Stats Grid -->
     <div class="stats-grid">
@@ -129,7 +136,7 @@
     <div class="recent-section">
       <div class="section-header">
         <h2 class="section-title">Recent Expenses</h2>
-        <button class="btn btn-secondary" onclick="viewAllExpenses()">View All</button>
+        <button class="btn btn-primary" onclick="viewAllExpenses()">View All</button>
       </div>
       <div class="expenses-card">
         <div id="recentExpenses">
@@ -177,43 +184,43 @@
   </div>
 
   <!-- Add Category Modal -->
-<div class="modal-overlay" id="addCategoryModal">
-  <div class="modal">
-    <h2>Add New Category</h2>
-    <form id="addCategoryForm">
-      <div class="form-group">
-        <label for="categoryName">Category Name</label>
-        <input type="text" id="categoryName" name="name" required>
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-        <button type="button" class="btn btn-secondary" onclick="closeAddCategoryModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Category</button>
-      </div>
-    </form>
+  <div class="modal-overlay" id="addCategoryModal">
+    <div class="modal">
+      <h2>Add New Category</h2>
+      <form id="addCategoryForm">
+        <div class="form-group">
+          <label for="categoryName">Category Name</label>
+          <input type="text" id="categoryName" name="name" required>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAddCategoryModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Category</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- Add Payment Type Modal -->
-<div class="modal-overlay" id="addPaymentModal">
-  <div class="modal">
-    <h2>Add New Payment Type</h2>
-    <form id="addPaymentForm">
-      <div class="form-group">
-        <label for="paymentType">Payment Type</label>
-        <input type="text" id="paymentType" name="type" required>
-      </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-        <button type="button" class="btn btn-secondary" onclick="closeAddPaymentModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Add Payment Type</button>
-      </div>
-    </form>
+  <!-- Add Payment Type Modal -->
+  <div class="modal-overlay" id="addPaymentModal">
+    <div class="modal">
+      <h2>Add New Payment Type</h2>
+      <form id="addPaymentForm">
+        <div class="form-group">
+          <label for="paymentType">Payment Type</label>
+          <input type="text" id="paymentType" name="type" required>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAddPaymentModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Payment Type</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
-    <!-- Scripts -->
-    <script src="../Config/config.js"></script>
-    <script src="../JS/api.js"></script>
-    <script src="../JS/dashboard.js"></script>
+  <!-- Scripts -->
+  <script src="../Config/config.js"></script>
+  <script src="../JS/api.js"></script>
+  <script src="../JS/dashboard.js"></script>
 
 </body>
 </html>

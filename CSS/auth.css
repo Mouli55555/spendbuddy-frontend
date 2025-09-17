@@ -18,6 +18,7 @@ body {
     align-items: center;
     position: relative;
     overflow: hidden;
+    padding: 20px 0;
 }
 
 .hero::before {
@@ -32,19 +33,20 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     position: relative;
     z-index: 1;
+    width: 100%;
 }
 
 .hero-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
+    gap: clamp(30px, 5vw, 60px);
     align-items: center;
-    min-height: 100vh;
+    min-height: calc(100vh - 40px);
 }
 
 .hero-text {
@@ -52,7 +54,7 @@ body {
 }
 
 .hero-text h1 {
-    font-size: 3.5rem;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
     font-weight: 700;
     margin-bottom: 1rem;
     line-height: 1.2;
@@ -63,20 +65,23 @@ body {
     background: linear-gradient(45deg, #4ade80, #22d3ee);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-text p {
-    font-size: 1.3rem;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
     margin-bottom: 2rem;
     opacity: 0.9;
     animation: fadeInUp 1s ease-out 0.2s both;
+    line-height: 1.5;
 }
 
 .features-preview {
     display: flex;
-    gap: 20px;
+    gap: clamp(10px, 3vw, 20px);
     margin-bottom: 2rem;
     animation: fadeInUp 1s ease-out 0.4s both;
+    flex-wrap: wrap;
 }
 
 .feature-item {
@@ -84,21 +89,24 @@ body {
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.1);
-    padding: 8px 16px;
+    padding: 8px 12px;
     border-radius: 20px;
     backdrop-filter: blur(10px);
+    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+    white-space: nowrap;
 }
 
 .feature-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #4ade80;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 12px;
+    font-size: 10px;
+    flex-shrink: 0;
 }
 
 /* Auth Card */
@@ -106,15 +114,18 @@ body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border-radius: 20px;
-    padding: 40px;
+    padding: clamp(20px, 4vw, 40px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: fadeInUp 1s ease-out 0.6s both;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
 }
 
 .auth-tabs {
     display: flex;
-    margin-bottom: 30px;
+    margin-bottom: clamp(20px, 4vw, 30px);
     background: #f1f5f9;
     border-radius: 12px;
     padding: 4px;
@@ -122,13 +133,14 @@ body {
 
 .auth-tab {
     flex: 1;
-    padding: 12px 20px;
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
     text-align: center;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
     color: #64748b;
+    font-size: clamp(0.85rem, 2vw, 1rem);
 }
 
 .auth-tab.active {
@@ -147,7 +159,7 @@ body {
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: clamp(16px, 3vw, 20px);
 }
 
 .form-group label {
@@ -155,14 +167,15 @@ body {
     margin-bottom: 8px;
     font-weight: 600;
     color: #374151;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
 .form-group input {
     width: 100%;
-    padding: 14px 16px;
+    padding: clamp(12px, 2.5vw, 14px) 16px;
     border: 2px solid #e5e7eb;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 16px; /* Prevents zoom on iOS */
     transition: all 0.3s ease;
     background: white;
 }
@@ -176,7 +189,7 @@ body {
 
 .submit-btn {
     width: 100%;
-    padding: 16px;
+    padding: clamp(14px, 3vw, 16px);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -239,9 +252,10 @@ body {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border-radius: 16px;
-    padding: 20px;
+    padding: clamp(15px, 3vw, 20px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     animation: float 6s ease-in-out infinite;
+    font-size: clamp(0.85rem, 2vw, 1rem);
 }
 
 .floating-card-1 {
@@ -268,6 +282,7 @@ body {
     border-radius: 8px;
     margin-bottom: 20px;
     display: none;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
 }
 
 .alert.success {
@@ -312,33 +327,220 @@ body {
     }
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* ===========================
+   RESPONSIVE BREAKPOINTS
+=========================== */
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1600px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .hero-content {
+        gap: 40px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 1023px) {
     .hero-content {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 30px;
         text-align: center;
-        padding: 40px 0;
+        padding: 20px 0;
+    }
+    
+    .auth-card {
+        max-width: 500px;
+    }
+    
+    .features-preview {
+        justify-content: center;
+    }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+    .hero {
+        min-height: auto;
+        padding: 30px 0;
+    }
+    
+    .hero-content {
+        min-height: auto;
+        gap: 25px;
+        padding: 20px 0;
+    }
+
+    .container {
+        padding: 0 15px;
     }
 
     .hero-text h1 {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
 
     .hero-text p {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     .auth-card {
-        padding: 30px 20px;
+        padding: 25px 20px;
+        margin: 0 10px;
     }
 
     .features-preview {
         flex-direction: column;
         align-items: center;
+        gap: 10px;
+    }
+
+    .feature-item {
+        width: fit-content;
+        padding: 6px 12px;
     }
 
     .floating-card {
         display: none;
+    }
+    
+    .auth-tabs {
+        margin-bottom: 20px;
+    }
+    
+    .auth-tab {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .submit-btn {
+        padding: 16px;
+        font-size: 16px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .hero {
+        padding: 20px 0;
+    }
+    
+    .container {
+        padding: 0 10px;
+    }
+
+    .hero-text h1 {
+        font-size: 1.8rem;
+    }
+
+    .auth-card {
+        padding: 20px 15px;
+        margin: 0 5px;
+        border-radius: 16px;
+    }
+    
+    .auth-tab {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .form-group input {
+        padding: 12px 14px;
+    }
+    
+    .submit-btn {
+        padding: 14px;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+    .hero-text h1 {
+        font-size: 1.6rem;
+    }
+    
+    .auth-card {
+        padding: 15px 12px;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 767px) and (orientation: landscape) and (max-height: 500px) {
+    .hero {
+        min-height: auto;
+        padding: 10px 0;
+    }
+    
+    .hero-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: center;
+        min-height: auto;
+    }
+    
+    .hero-text {
+        text-align: left;
+    }
+    
+    .hero-text h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hero-text p {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .features-preview {
+        flex-direction: row;
+        gap: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-card {
+        padding: 20px;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .hero::before {
+        background-size: contain;
+    }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .auth-card {
+        border: 2px solid #333;
+        background: white;
+    }
+    
+    .submit-btn {
+        background: #000;
+        border: 2px solid #000;
+    }
+    
+    .auth-tab.active {
+        background: #000;
+        color: white;
     }
 }

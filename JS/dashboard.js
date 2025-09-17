@@ -1,4 +1,3 @@
-
 /* ============================================================
    SpendBuddy Dashboard Script
    Handles initialization, data loading, UI updates & charts
@@ -16,6 +15,11 @@ const dashboardState = {
   paymentTypes: [],
   currentMonthExpenses: [],
   loading: true,
+  isSubmitting: {
+    expense: false,
+    category: false,
+    payment: false
+  }
 };
 
 /* --------------------------
@@ -231,7 +235,7 @@ function generateDailyTrendData() {
     );
 
     const dayTotal = dayExpenses.reduce(
-      (sum, exp) => sum + parseFloat(exp.expenseAmount || 0), // Changed from exp.amount
+      (sum, exp) => sum + parseFloat(exp.expenseAmount || 0),
       0
     );
     values.push(dayTotal);
@@ -243,10 +247,10 @@ function generateDailyTrendData() {
 function generateCategoryData() {
   const categoryExpenses = {};
   dashboardState.currentMonthExpenses.forEach((expense) => {
-    const categoryName = expense.categoryName || "Unknown"; // Direct field access
+    const categoryName = expense.categoryName || "Unknown";
     categoryExpenses[categoryName] =
       (categoryExpenses[categoryName] || 0) +
-      parseFloat(expense.expenseAmount || 0); // Changed from expense.amount
+      parseFloat(expense.expenseAmount || 0);
   });
 
   return {
@@ -331,7 +335,10 @@ function populateDropdowns() {
    Modal Controls
 -------------------------- */
 function openAddExpenseModal() {
-  document.getElementById("addExpenseModal").style.display = "block";
+  const modal = document.getElementById("addExpenseModal");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
 }
 
 function closeAddExpenseModal() {
@@ -339,15 +346,50 @@ function closeAddExpenseModal() {
   document.getElementById("addExpenseForm").reset();
 }
 
+// Category Modal Functions
+function openAddCategoryModal() {
+  const modal = document.getElementById("addCategoryModal");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+}
+
+function closeAddCategoryModal() {
+  document.getElementById("addCategoryModal").style.display = "none";
+  document.getElementById("addCategoryForm").reset();
+}
+
+// Payment Modal Functions  
+function openAddPaymentModal() {
+  const modal = document.getElementById("addPaymentModal");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+}
+
+function closeAddPaymentModal() {
+  document.getElementById("addPaymentModal").style.display = "none";
+  document.getElementById("addPaymentForm").reset();
+}
+
 /* --------------------------
    Form Handling
 -------------------------- */
-  document.getElementById("addExpenseForm")
-  .addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById("addExpenseForm")
+.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
+  if (dashboardState.isSubmitting.expense) return;
+  
+  dashboardState.isSubmitting.expense = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Adding...';
+  submitBtn.disabled = true;
+
+  try {
     const formData = new FormData(e.target);
-      const expenseData = {
+    const expenseData = {
       amount: parseFloat(formData.get("amount")),
       expenseDescription: formData.get("expenseDescription"),
       categoryId: parseInt(formData.get("categoryId")),
@@ -356,7 +398,6 @@ function closeAddExpenseModal() {
       expenseDate: formData.get("expenseDate"),
     };
     console.log("FormData entries:", [...formData.entries()]);
-
 
     console.log("📤 Submitting expense:", expenseData); 
 
@@ -374,8 +415,82 @@ function closeAddExpenseModal() {
       console.error("❌ API Error:", result);
       showError(result.error || "Failed to add expense");
     }
-  });
+  } finally {
+    dashboardState.isSubmitting.expense = false;
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
 
+// Category Form Handler
+document.getElementById("addCategoryForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  if (dashboardState.isSubmitting.category) return;
+  
+  dashboardState.isSubmitting.category = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Adding...';
+  submitBtn.disabled = true;
+  
+  try {
+    const formData = new FormData(e.target);
+    const categoryData = {
+      name: formData.get("name")
+    };
+
+    const result = await api.createCategory(categoryData);
+    
+    if (result.success) {
+      showSuccess("Category added successfully!");
+      closeAddCategoryModal();
+      await loadCategories();
+      populateDropdowns();
+    } else {
+      showError(result.error || "Failed to add category");
+    }
+  } finally {
+    dashboardState.isSubmitting.category = false;
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
+
+// Payment Type Form Handler
+document.getElementById("addPaymentForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  if (dashboardState.isSubmitting.payment) return;
+  
+  dashboardState.isSubmitting.payment = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Adding...';
+  submitBtn.disabled = true;
+  
+  try {
+    const formData = new FormData(e.target);
+    const paymentData = {
+      type: formData.get("type")
+    };
+
+    const result = await api.createPaymentType(paymentData);
+    
+    if (result.success) {
+      showSuccess("Payment type added successfully!");
+      closeAddPaymentModal();
+      await loadPaymentTypes();
+      populateDropdowns();
+    } else {
+      showError(result.error || "Failed to add payment type");
+    }
+  } finally {
+    dashboardState.isSubmitting.payment = false;
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
 
 /* --------------------------
    Notifications
@@ -427,7 +542,11 @@ document
   });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeAddExpenseModal();
+  if (e.key === "Escape") {
+    closeAddExpenseModal();
+    closeAddCategoryModal();
+    closeAddPaymentModal();
+  }
   if (e.ctrlKey && e.key === "n") {
     e.preventDefault();
     openAddExpenseModal();
@@ -478,66 +597,5 @@ window.addEventListener("unhandledrejection", (event) => {
       "Authentication error detected - redirecting to login"
     );
     api.handleUnauthorized();
-  }
-});
-// Category Modal Functions
-function openAddCategoryModal() {
-  document.getElementById("addCategoryModal").style.display = "block";
-}
-
-function closeAddCategoryModal() {
-  document.getElementById("addCategoryModal").style.display = "none";
-  document.getElementById("addCategoryForm").reset();
-}
-
-// Payment Modal Functions  
-function openAddPaymentModal() {
-  document.getElementById("addPaymentModal").style.display = "block";
-}
-
-function closeAddPaymentModal() {
-  document.getElementById("addPaymentModal").style.display = "none";
-  document.getElementById("addPaymentForm").reset();
-}
-
-// Category Form Handler
-document.getElementById("addCategoryForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const formData = new FormData(e.target);
-  const categoryData = {
-    name: formData.get("name")
-  };
-
-  const result = await api.createCategory(categoryData);
-  
-  if (result.success) {
-    showSuccess("Category added successfully!");
-    closeAddCategoryModal();
-    await loadCategories();
-    populateDropdowns();
-  } else {
-    showError(result.error || "Failed to add category");
-  }
-});
-
-// Payment Type Form Handler
-document.getElementById("addPaymentForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const formData = new FormData(e.target);
-  const paymentData = {
-    type: formData.get("type")
-  };
-
-  const result = await api.createPaymentType(paymentData);
-  
-  if (result.success) {
-    showSuccess("Payment type added successfully!");
-    closeAddPaymentModal();
-    await loadPaymentTypes();
-    populateDropdowns();
-  } else {
-    showError(result.error || "Failed to add payment type");
   }
 });

@@ -22,7 +22,8 @@ const expensesState = {
     sort: 'date-desc',
     startDate: null,
     endDate: null
-  }
+  },
+  isSubmitting: false
 };
 
 /* --------------------------
@@ -140,6 +141,9 @@ function setupEventListeners() {
     if (e.target === e.currentTarget) closeExpenseDetailModal();
   });
 
+  // Fix cancel button colors
+  fixCancelButtonColors();
+
   // Keyboard shortcuts
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
@@ -149,6 +153,18 @@ function setupEventListeners() {
     if (e.ctrlKey && e.key === 'n') {
       e.preventDefault();
       openAddExpenseModal();
+    }
+  });
+}
+
+function fixCancelButtonColors() {
+  // Fix cancel buttons that might be blending with background
+  const cancelButtons = document.querySelectorAll('button[onclick*="close"], button[type="button"]');
+  cancelButtons.forEach(btn => {
+    if (btn.textContent.toLowerCase().includes('cancel') || btn.textContent.toLowerCase().includes('close')) {
+      btn.style.backgroundColor = '#6b7280';
+      btn.style.color = '#ffffff';
+      btn.style.border = '1px solid #6b7280';
     }
   });
 }
@@ -329,6 +345,7 @@ function changePage(dir) {
   if (newPage > totalPages) newPage = totalPages;
   expensesState.currentPage = newPage;
   displayExpenses();
+  updatePagination();
 }
 
 /* --------------------------
@@ -377,7 +394,10 @@ function escapeHtml(text) {
    Modals
 -------------------------- */
 function openAddExpenseModal() {
-  document.getElementById('addExpenseModal').style.display = 'flex';
+  const modal = document.getElementById('addExpenseModal');
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
   document.getElementById('addExpenseForm').reset();
   document.getElementById('expenseDate').valueAsDate = new Date();
 }
@@ -397,7 +417,10 @@ function openExpenseDetailModal(id) {
       <div class="detail-row"><div class="detail-label">Category:</div><div class="detail-value">${exp.categoryName}</div></div>
       <div class="detail-row"><div class="detail-label">Payment:</div><div class="detail-value">${exp.paymentType}</div></div>`;
   }
-  document.getElementById('expenseDetailModal').style.display = 'flex';
+  const modal = document.getElementById('expenseDetailModal');
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
 }
 function closeExpenseDetailModal() {
   document.getElementById('expenseDetailModal').style.display = 'none';
@@ -408,29 +431,44 @@ function closeExpenseDetailModal() {
 -------------------------- */
 async function handleAddExpense(e) {
   e.preventDefault();
-  const formData = new FormData(e.target);
-  const data = {
-    amount: parseFloat(formData.get('amount')),
-    expenseDescription: formData.get('expenseDescription'),
-    categoryId: parseInt(formData.get('categoryId')),
-    paymentId: parseInt(formData.get('paymentId')),
-    subCategoryId: 1,
-    expenseDate: formData.get('expenseDate')
-  };
+  
+  if (expensesState.isSubmitting) return;
+  
+  expensesState.isSubmitting = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Adding...';
+  submitBtn.disabled = true;
+  
+  try {
+    const formData = new FormData(e.target);
+    const data = {
+      amount: parseFloat(formData.get('amount')),
+      expenseDescription: formData.get('expenseDescription'),
+      categoryId: parseInt(formData.get('categoryId')),
+      paymentId: parseInt(formData.get('paymentId')),
+      subCategoryId: 1,
+      expenseDate: formData.get('expenseDate')
+    };
 
-  if (!data.amount || data.amount <= 0) return showError('Enter a valid amount');
-  if (!data.expenseDescription.trim()) return showError('Enter description');
-  if (!data.categoryId) return showError('Select a category');
-  if (!data.paymentId) return showError('Select a payment method');
+    if (!data.amount || data.amount <= 0) return showError('Enter a valid amount');
+    if (!data.expenseDescription.trim()) return showError('Enter description');
+    if (!data.categoryId) return showError('Select a category');
+    if (!data.paymentId) return showError('Select a payment method');
 
-  const result = await api.createExpense(data);
-  if (result.success) {
-    showSuccess('Expense added');
-    closeAddExpenseModal();
-    await loadAllExpenses();
-    applyFilters();
-  } else {
-    showError(result.error || 'Failed to add expense');
+    const result = await api.createExpense(data);
+    if (result.success) {
+      showSuccess('Expense added');
+      closeAddExpenseModal();
+      await loadAllExpenses();
+      applyFilters();
+    } else {
+      showError(result.error || 'Failed to add expense');
+    }
+  } finally {
+    expensesState.isSubmitting = false;
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
   }
 }
 
