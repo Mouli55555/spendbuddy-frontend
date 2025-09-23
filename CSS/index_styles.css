@@ -206,3 +206,43 @@
         display: none;
     }
 }
+/* Minimal Footer */
+.site-footer {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 15px 0;
+  text-align: center;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-text {
+  color: rgba(65, 206, 245, 0.9);
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.footer-link {
+  color: #4ade80;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #22d3ee;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .footer-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
