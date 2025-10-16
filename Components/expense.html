@@ -66,6 +66,17 @@
     <!-- Filters Section -->
     <div class="filters-section">
       <div class="filters-container">
+
+        <div class="filter-group search-group">
+        <label for="searchInput">Search Expenses</label>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Search by description..." 
+          autocomplete="off">
+        </div>
+
+
         <div class="filter-group">
           <label for="dateFilter">Date Range</label>
           <select id="dateFilter">
@@ -222,6 +233,7 @@
   <!-- Scripts -->
   <script src="../Config/config.js"></script>
   <script src="../JS/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="../JS/expenses.js"></script>
 </body>
 </html>

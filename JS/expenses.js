@@ -1,5 +1,5 @@
 /* ============================================================
-   SpendBuddy Expenses Page Script - FINAL FIXED VERSION
+   SpendBuddy Expenses Page Script - WITH EDIT & DELETE
    Handles expense listing, filtering, pagination, and modals
    Dependencies: config.js, api.js
 ============================================================ */
@@ -20,10 +20,12 @@ const expensesState = {
     category: 'all',
     payment: 'all',
     sort: 'date-desc',
+    search: '',
     startDate: null,
     endDate: null
   },
-  isSubmitting: false
+  isSubmitting: false,
+  editingExpenseId: null // ADDED FOR EDIT FUNCTIONALITY
 };
 
 /* --------------------------
@@ -124,6 +126,12 @@ function populateExpenseFormDropdowns() {
 }
 
 function setupEventListeners() {
+
+  // Search input - real-time filtering
+    document.getElementById('searchInput').addEventListener('input', e => {
+      expensesState.filters.search = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
   // Date filter -> toggle custom range
   document.getElementById('dateFilter').addEventListener('change', e => {
     const customRange = document.getElementById('customDateRange');
@@ -179,23 +187,40 @@ function applyFilters() {
   const sortFilter = document.getElementById('sortFilter').value;
   const startDate = document.getElementById('startDate').value;
   const endDate = document.getElementById('endDate').value;
+  const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim(); // ADD THIS
 
-  expensesState.filters = { dateRange: dateFilter, category: categoryFilter, payment: paymentFilter, sort: sortFilter, startDate, endDate };
+  expensesState.filters = { 
+    dateRange: dateFilter, 
+    category: categoryFilter, 
+    payment: paymentFilter, 
+    sort: sortFilter, 
+    search: searchQuery, // ADD THIS
+    startDate, 
+    endDate 
+  };
 
   let filtered = [...expensesState.allExpenses];
 
-
-    console.log("hiii", filtered, " " , categoryFilter," ",paymentFilter);
+  console.log("Filtering:", filtered, categoryFilter, paymentFilter);
+  
+  // Search filter - ADD THIS BLOCK
+  if (searchQuery) {
+    filtered = filtered.filter(exp => 
+      (exp.expenseDescription || '').toLowerCase().includes(searchQuery) ||
+      (exp.categoryName || '').toLowerCase().includes(searchQuery) ||
+      (exp.paymentType || '').toLowerCase().includes(searchQuery)
+    );
+  }
+  
   // Date filter
   if (dateFilter !== 'all') filtered = filterByDate(filtered, dateFilter, startDate, endDate);
 
-
-  // Category filter (using categoryId)
+  // Category filter (using categoryName)
   if (categoryFilter !== 'all') {
     filtered = filtered.filter(exp => String(exp.categoryName) === String(categoryFilter));
   }
 
-  // Payment filter (using paymentId)
+  // Payment filter (using paymentType)
   if (paymentFilter !== 'all') {
     filtered = filtered.filter(exp => String(exp.paymentType) === String(paymentFilter));
   }
@@ -314,6 +339,8 @@ function displayExpenses() {
         <div>${formatCurrency(exp.expenseAmount)}</div>
         <div class="expense-actions">
           <button class="btn btn-primary" onclick="openExpenseDetailModal('${exp.id}')">View</button>
+          <button class="btn btn-edit" onclick="openEditExpenseModal('${exp.id}')" title="Edit" style="padding: 8px 12px; margin-left: 8px;">✏️</button>
+          <button class="btn btn-delete" onclick="confirmDeleteExpense('${exp.id}')" title="Delete" style="padding: 8px 12px;">🗑️</button>
         </div>
       </div>`;
     container.appendChild(item);
@@ -394,16 +421,187 @@ function escapeHtml(text) {
    Modals
 -------------------------- */
 function openAddExpenseModal() {
+  console.log("📝 Opening add expense modal");
+  
+  // Reset editing state
+  expensesState.editingExpenseId = null;
+  
   const modal = document.getElementById('addExpenseModal');
+  const modalTitle = modal.querySelector('h2');
+  const submitBtn = modal.querySelector('button[type="submit"]');
+  
+  // Reset modal UI for adding
+  modalTitle.textContent = 'Add New Expense';
+  submitBtn.textContent = 'Add Expense';
+  
   modal.style.display = 'flex';
   modal.style.alignItems = 'center';
   modal.style.justifyContent = 'center';
   document.getElementById('addExpenseForm').reset();
   document.getElementById('expenseDate').valueAsDate = new Date();
 }
+
 function closeAddExpenseModal() {
+  console.log("❌ Closing expense modal");
+  expensesState.editingExpenseId = null;
   document.getElementById('addExpenseModal').style.display = 'none';
 }
+
+function openEditExpenseModal(expenseId) {
+  console.log("📝 Opening edit expense modal for ID:", expenseId);
+  
+  const expense = expensesState.allExpenses.find(exp => String(exp.id) === String(expenseId));
+  
+  if (!expense) {
+    showError("Expense not found");
+    return;
+  }
+  
+  console.log("🔍 Full expense object:", expense);
+  console.log("📋 Available categories:", expensesState.categories);
+  console.log("💳 Available payment types:", expensesState.paymentTypes);
+  
+  // Store the ID we're editing
+  expensesState.editingExpenseId = expenseId;
+  
+  // Populate basic form fields
+  document.getElementById("expenseAmount").value = expense.expenseAmount;
+  document.getElementById("expenseDescription").value = expense.expenseDescription;
+  document.getElementById("expenseDate").value = expense.expenseDate;
+  
+  // Set category dropdown
+  const categorySelect = document.getElementById("expenseCategory");
+  // Try to find by categoryId first, then by categoryName
+  let categoryId = expense.categoryId;
+  
+  if (!categoryId) {
+    // If categoryId is not present, find it by name
+    const matchingCategory = expensesState.categories.find(cat => 
+      String(cat.name).toLowerCase() === String(expense.categoryName).toLowerCase()
+    );
+    categoryId = matchingCategory ? matchingCategory.id : null;
+  }
+  
+  if (categoryId) {
+    categorySelect.value = categoryId;
+    console.log("✅ Set category to:", categoryId, "- Current value:", categorySelect.value);
+  } else {
+    console.warn("⚠️ Could not find category ID for:", expense.categoryName);
+  }
+  
+  // Set payment dropdown
+  const paymentSelect = document.getElementById("expensePayment");
+  // Try to find by paymentId first, then by paymentType
+  let paymentId = expense.paymentId;
+  
+  if (!paymentId) {
+    // If paymentId is not present, find it by type
+    const matchingPayment = expensesState.paymentTypes.find(pt => 
+      String(pt.type).toLowerCase() === String(expense.paymentType).toLowerCase()
+    );
+    paymentId = matchingPayment ? matchingPayment.id : null;
+  }
+  
+  if (paymentId) {
+    paymentSelect.value = paymentId;
+    console.log("✅ Set payment to:", paymentId, "- Current value:", paymentSelect.value);
+  } else {
+    console.warn("⚠️ Could not find payment ID for:", expense.paymentType);
+  }
+  
+  // Change modal title and button text
+  const modal = document.getElementById("addExpenseModal");
+  const modalTitle = modal.querySelector("h2");
+  const submitBtn = modal.querySelector('button[type="submit"]');
+  
+  modalTitle.textContent = "Update Expense";
+  submitBtn.textContent = "Update Expense";
+  
+  // Show modal
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+}
+
+async function confirmDeleteExpense(expenseId) {
+  console.log("🗑️ Confirming delete for expense ID:", expenseId);
+
+  const expense = expensesState.allExpenses.find(exp => String(exp.id) === String(expenseId));
+  
+  if (!expense) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Expense Not Found',
+      text: 'The selected expense could not be found.',
+      confirmButtonColor: '#d33'
+    });
+    return;
+  }
+
+  const { value: confirmed } = await Swal.fire({
+    title: 'Delete Expense?',
+    html: `
+      <div style="text-align:left;">
+        <p><b>${expense.expenseDescription}</b></p>
+        <p>💰 Amount: ${formatCurrency(expense.expenseAmount)}</p>
+        <p>📅 Date: ${formatDate(expense.expenseDate)}</p>
+      </div>
+    `,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#e74c3c',
+    cancelButtonColor: '#6c757d',
+    reverseButtons: true,
+    backdrop: true
+  });
+
+  if (confirmed) {
+    await deleteExpense(expenseId);
+  }
+}
+
+async function deleteExpense(expenseId) {
+  console.log("🗑️ Deleting expense ID:", expenseId);
+  
+  try {
+    const result = await api.deleteExpense(expenseId);
+    console.log("📥 Delete expense result:", result);
+
+    if (result.success) {
+      console.log("✅ Expense deleted successfully");
+      
+      await Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: 'Expense deleted successfully.',
+        showConfirmButton: false,
+        timer: 1500
+      });
+
+      await loadAllExpenses();
+      applyFilters();
+    } else {
+      console.error("❌ Failed to delete expense:", result);
+      Swal.fire({
+        icon: 'error',
+        title: 'Delete Failed',
+        text: result.error || 'Failed to delete expense.',
+        confirmButtonColor: '#d33'
+      });
+    }
+  } catch (error) {
+    console.error("❌ Exception during expense deletion:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'An error occurred while deleting the expense.',
+      confirmButtonColor: '#d33'
+    });
+  }
+}
+
 function openExpenseDetailModal(id) {
   const exp = expensesState.allExpenses.find(e => String(e.id) === String(id));
   const content = document.getElementById('expenseDetailContent');
@@ -422,12 +620,13 @@ function openExpenseDetailModal(id) {
   modal.style.alignItems = 'center';
   modal.style.justifyContent = 'center';
 }
+
 function closeExpenseDetailModal() {
   document.getElementById('expenseDetailModal').style.display = 'none';
 }
 
 /* --------------------------
-   Add Expense
+   Add/Edit Expense
 -------------------------- */
 async function handleAddExpense(e) {
   e.preventDefault();
@@ -437,7 +636,9 @@ async function handleAddExpense(e) {
   expensesState.isSubmitting = true;
   const submitBtn = e.target.querySelector('button[type="submit"]');
   const originalText = submitBtn.textContent;
-  submitBtn.textContent = 'Adding...';
+  const isEditing = expensesState.editingExpenseId !== null;
+  
+  submitBtn.textContent = isEditing ? 'Updating...' : 'Adding...';
   submitBtn.disabled = true;
   
   try {
@@ -451,19 +652,39 @@ async function handleAddExpense(e) {
       expenseDate: formData.get('expenseDate')
     };
 
-    if (!data.amount || data.amount <= 0) return showError('Enter a valid amount');
-    if (!data.expenseDescription.trim()) return showError('Enter description');
-    if (!data.categoryId) return showError('Select a category');
-    if (!data.paymentId) return showError('Select a payment method');
+    if (!data.amount || data.amount <= 0) {
+      showError('Enter a valid amount');
+      return;
+    }
+    if (!data.expenseDescription.trim()) {
+      showError('Enter description');
+      return;
+    }
+    if (!data.categoryId) {
+      showError('Select a category');
+      return;
+    }
+    if (!data.paymentId) {
+      showError('Select a payment method');
+      return;
+    }
 
-    const result = await api.createExpense(data);
+    let result;
+    if (isEditing) {
+      console.log("📤 Updating expense:", expensesState.editingExpenseId, data);
+      result = await api.updateExpense(expensesState.editingExpenseId, data);
+    } else {
+      console.log("📤 Creating expense:", data);
+      result = await api.createExpense(data);
+    }
+    
     if (result.success) {
-      showSuccess('Expense added');
+      showSuccess(isEditing ? 'Expense updated successfully!' : 'Expense added successfully!');
       closeAddExpenseModal();
       await loadAllExpenses();
       applyFilters();
     } else {
-      showError(result.error || 'Failed to add expense');
+      showError(result.error || `Failed to ${isEditing ? 'update' : 'add'} expense`);
     }
   } finally {
     expensesState.isSubmitting = false;
@@ -478,16 +699,19 @@ async function handleAddExpense(e) {
 function updateResultsCount(count) {
   document.getElementById('resultsCount').textContent = count;
 }
+
 function resetFilters() {
   document.getElementById('dateFilter').value = 'all';
   document.getElementById('categoryFilter').value = 'all';
   document.getElementById('paymentFilter').value = 'all';
   document.getElementById('sortFilter').value = 'date-desc';
+  document.getElementById('searchInput').value = ''; // ADD THIS LINE
   document.getElementById('startDate').value = '';
   document.getElementById('endDate').value = '';
   document.getElementById('customDateRange').style.display = 'none';
   applyFilters();
 }
+
 function goBack() {
   window.location.href = '../Components/dashboard.html';
 }

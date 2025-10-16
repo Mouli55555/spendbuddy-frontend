@@ -380,6 +380,34 @@ class ApiService {
             return { success: false, error: error.message || 'Failed to fetch current month expenses by category' };
         }
     }
+    async updateExpense(expenseId, expenseData) {
+    try {
+        const endpoint = `${CONFIG.API.ENDPOINTS.EXPENSES}/${expenseId}`;
+        const response = await this.makeRequest(endpoint, {
+            method: 'PUT',
+            body: JSON.stringify(expenseData)
+        });
+            
+        CONFIG.utils.log('info', 'Expense updated successfully');
+        return { success: true, data: response };
+    } catch (error) {
+        return { success: false, error: error.message || 'Failed to update expense' };
+        }
+    }
+
+      async deleteExpense(expenseId) {
+        try {
+            const endpoint = `${CONFIG.API.ENDPOINTS.EXPENSES}/${expenseId}`;
+            const response = await this.makeRequest(endpoint, {
+                method: 'DELETE'
+            });
+            
+            CONFIG.utils.log('info', 'Expense deleted successfully');
+            return { success: true, data: response };
+        } catch (error) {
+            return { success: false, error: error.message || 'Failed to delete expense' };
+        }
+    }
 
     // ================================
     // UTILITY METHODS

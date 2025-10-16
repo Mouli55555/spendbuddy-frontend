@@ -291,6 +291,9 @@ body {
 /* ===========================
    Recent Expenses
 =========================== */
+/* ===========================
+   Recent Expenses
+=========================== */
 .recent-section {
   animation: fadeInUp 0.8s ease-out 0.6s both;
 }
@@ -386,7 +389,6 @@ body {
   color: #ef4444;
   flex-shrink: 0;
 }
-
 /* ===========================
    Quick Actions Section
 =========================== */
@@ -734,19 +736,53 @@ body {
     align-items: flex-start;
   }
 
+  .expense-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 16px);
+  flex-shrink: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+
   .expense-item {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 12px;
-    padding: 15px 0;
+    padding: 15px 10px;
   }
 
   .expense-info {
     width: 100%;
+    flex: 1;
+    min-width: 0;
+  }
+  .expense-amount {
+    align-self: flex-end;
+  }
+
+  .expense-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 6px;
   }
 
   .expense-amount {
+    align-items: auto;
     align-self: flex-end;
+    white-space: nowrap;
   }
 }
 
@@ -988,5 +1024,420 @@ body {
   .footer-text {
     font-size: 0.8rem;
     line-height: 1.4;
+  }
+}
+
+/* Edit/Delete Icon Buttons - ENHANCED */
+.btn-icon {
+  background: transparent;
+  border: 2px solid transparent;
+  font-size: clamp(16px, 3vw, 18px);
+  cursor: pointer;
+  padding: clamp(6px, 1.5vw, 8px);
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(36px, 7vw, 40px);
+  min-height: clamp(36px, 7vw, 40px);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn-edit {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.btn-edit::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
+}
+
+.btn-edit:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-edit:hover::before {
+  opacity: 1;
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-delete::before {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover::before {
+  opacity: 1;
+}
+
+.btn-icon:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.btn-icon:focus-visible {
+  outline: 3px solid rgba(102, 126, 234, 0.4);
+  outline-offset: 2px;
+}
+/* ===========================
+   DASHBOARD CSS UPDATES
+   Add these styles to your existing dashboard.css
+=========================== */
+
+/* Recent Expenses Container - Update */
+.expenses-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: clamp(20px, 4vw, 30px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Expense Item - Matching Expense.js Style */
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(12px, 3vw, 15px) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  gap: 15px;
+}
+
+.expense-item:hover {
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.expense-item:last-child {
+  border-bottom: none;
+}
+
+/* Expense Info Container */
+.expense-info {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2.5vw, 15px);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Expense Icon */
+.expense-icon {
+  width: clamp(40px, 8vw, 45px);
+  height: clamp(40px, 8vw, 45px);
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: clamp(16px, 3vw, 18px);
+  flex-shrink: 0;
+}
+
+/* Expense Details */
+.expense-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.expense-details h4 {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 3px;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Expense Meta Information */
+.expense-meta {
+  font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+  color: #64748b;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.expense-meta span {
+  display: inline-block;
+}
+
+/* Expense Amount Section */
+.expense-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.expense-amount > div:first-child {
+  font-weight: 700;
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
+  color: #ef4444;
+}
+
+/* Expense Actions */
+.expense-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Button Styles for Expense Actions */
+.btn.small {
+  padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2.5vw, 16px);
+  font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+}
+
+/* Edit/Delete Icon Buttons - ENHANCED */
+.btn-icon {
+  background: transparent;
+  border: 2px solid transparent;
+  font-size: clamp(16px, 3vw, 18px);
+  cursor: pointer;
+  padding: clamp(6px, 1.5vw, 8px);
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(36px, 7vw, 40px);
+  min-height: clamp(36px, 7vw, 40px);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn-edit {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.btn-edit::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
+}
+
+.btn-edit:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-edit:hover::before {
+  opacity: 1;
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-delete::before {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover::before {
+  opacity: 1;
+}
+
+.btn-icon:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.btn-icon:focus-visible {
+  outline: 3px solid rgba(102, 126, 234, 0.4);
+  outline-offset: 2px;
+}
+
+/* Empty State Styling */
+.empty-state {
+  text-align: center;
+  padding: clamp(40px, 8vw, 60px) clamp(20px, 4vw, 40px);
+  color: #64748b;
+}
+
+.empty-state-icon {
+  font-size: clamp(3rem, 8vw, 4rem);
+  margin-bottom: clamp(15px, 3vw, 20px);
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  font-weight: 700;
+}
+
+.empty-state p {
+  margin-bottom: clamp(15px, 3vw, 20px);
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+/* Detail Modal Styles */
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(12px, 3vw, 15px) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 15px;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+}
+
+.detail-value {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  text-align: right;
+}
+
+/* ===========================
+   RESPONSIVE UPDATES
+=========================== */
+
+/* Mobile Adjustments */
+@media (max-width: 767px) {
+  .expense-item {
+    padding: 15px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .expense-info {
+    width: 100%;
+  }
+
+  .expense-amount {
+    align-self: flex-end;
+    text-align: right;
+  }
+
+  .expense-meta {
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+
+  .expense-actions {
+    justify-content: flex-start;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .detail-value {
+    text-align: left;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .expense-item {
+    padding: 12px 0;
+  }
+
+  .expense-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+
+  .expense-details h4 {
+    font-size: 0.9rem;
+  }
+
+  .expense-meta {
+    font-size: 0.7rem;
+  }
+
+  .expense-amount > div:first-child {
+    font-size: 0.95rem;
+  }
+
+  .btn-icon {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 14px;
+    padding: 4px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .expense-item {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .expense-amount {
+    align-self: center;
+  }
+
+  .expense-meta {
+    flex-direction: row;
+    gap: 10px;
   }
 }

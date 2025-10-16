@@ -248,6 +248,28 @@ body {
   align-items: center;
 }
 
+/* Search Input Styling */
+.search-group {
+  grid-column: span 2;
+}
+
+.search-group input {
+  background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 16px center;
+  padding-left: 48px;
+}
+
+@media (max-width: 1023px) {
+  .search-group {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 767px) {
+  .search-group {
+    grid-column: span 1;
+  }
+}
+
 /* ===========================
    Expenses Section
 =========================== */
@@ -1119,4 +1141,80 @@ body {
     font-size: 0.8rem;
     line-height: 1.4;
   }
+}
+
+/* Edit/Delete Icon Buttons - ENHANCED */
+.btn-icon {
+  background: transparent;
+  border: 2px solid transparent;
+  font-size: clamp(16px, 3vw, 18px);
+  cursor: pointer;
+  padding: clamp(6px, 1.5vw, 8px);
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(36px, 7vw, 40px);
+  min-height: clamp(36px, 7vw, 40px);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.btn-edit {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.btn-edit::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
+}
+
+.btn-edit:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-edit:hover::before {
+  opacity: 1;
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-delete::before {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.15));
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover::before {
+  opacity: 1;
+}
+
+.btn-icon:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.btn-icon:focus-visible {
+  outline: 3px solid rgba(102, 126, 234, 0.4);
+  outline-offset: 2px;
 }
